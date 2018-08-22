@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <script
+        src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous">
+    </script>
+    <script src="semantic/dist/semantic.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="js/map.js"></script>
+    <title>imTheMap</title>
+
+</head>
+<body>
+  <div class="ui very wide sidebar inverted vertical menu">
+    <div id="sideContainer" class="ui container">
+        <div id="searchBox" class="ui icon input">
+            <input type="text" id="pac-input" placeholder="Search...">
+            <i class="inverted circular search link icon"></i>
+          </div>
+    </div>
+   
+  </div>
+  <div class="pusher">
+    <!-- MAP !-->
+    <button id="sidebutton" class="right attached ui secondary open button">
+      <i class="align justify icon"></i>
+    </button>
+    <div id="map"></div>
+    <div id="right-panel">
+        <h2>Results</h2>
+        <ul id="places"></ul>
+        <button id="more">More results</button>
+    </div>
+    <!-- content of the place-->
+    <div id="infowindow-content">
+        <img src="" width="16" height="16" id="place-icon">
+        <span id="place-name"  class="title"></span><br>
+        <span id="place-address"></span>
+      </div>
+  </div>
+  <script src="js/load.js"></script>
+    
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKHT1jXtj-W4NcZpOY1Tzt8z-avZhuFCU&libraries=places&callback=initMap" async defer></script>
+  
+</body>
+</html>

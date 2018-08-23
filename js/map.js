@@ -4,14 +4,24 @@ var map;
 var markers = [];
 var searchmarkers = [];
 var all_overlays = [];
+var end_direction  
+var directionsService
+var directionsDisplay
 function initMap() {
+  // directions
+   directionsService = new google.maps.DirectionsService();
+directionsDisplay = new google.maps.DirectionsRenderer({
+    draggable: true,
+    map: map,
+    panel: document.getElementById('sideDetails')
+  });
   // Create the map.
-  
   map = new google.maps.Map(document.getElementById('map'), {
     center: cebuMap,
     zoom: 12
   });
 
+  directionsDisplay.setMap(map);
   //searchMap
   searchMap();
   //showRestaurants
@@ -37,9 +47,7 @@ function generateInfoWindowContent(content){
 }
 
 function generateSideBarcontent(content){
-  console.log("start");
-  console.log(content);
-  console.log("wwe---------------");
+ 
   if ( content.opening_hours && typeof content.opening_hours != "undefined"){
     var branchopen = "N/A";
     if (content.opening_hours.open_now == true){
@@ -69,15 +77,38 @@ function generateSideBarcontent(content){
     </div>
   </div>
   </div>`
+  var elat = content.geometry.location.lat();
+  var elng = content.geometry.location.lng();
+  end_direction = {lat: elat, lng: elng};
   bindingFunction();
   
- 
 }
 
+
+function calcRoute() {
+  //var selectedMode = document.getElementById('mode').value;
+  var request = {
+      origin: cebuMap,
+      destination: end_direction,
+      // Note that Javascript allows us to access the constant
+      // using square brackets and a string value as its
+      // "property."
+      travelMode: google.maps.TravelMode['WALKING']
+  };
+  directionsService.route(request, function(response, status) {
+    if (status == 'OK') {
+
+      clearMarkers(markers);
+      clearMarkers(searchmarkers);
+      directionsDisplay.setDirections(response);
+     
+    }
+  });
+}
 function bindingFunction(){
   document.getElementById('getDirections').onclick = function() {
 //     Your code
-console.log("direction");
+calcRoute();
   }
 }
 function changeContent(){
@@ -107,6 +138,7 @@ function markerFunctions(marker, infowindow, content){
   });
 
   marker.addListener('click', function(){
+    //directionsDisplay.setMap(null);
     closableContent()
     searchMapViaId(content.place_id, function(trueContent){
      
@@ -186,18 +218,10 @@ function showRestaurants(rtype){
 
 function searchMapViaId(placeId){
   var service = new google.maps.places.PlacesService(map);
-  console.log("searchMapViaId ==============================")
-  console.log(placeId)
   service.getDetails({
     placeId: placeId
   }, function(place, status) {
     if (status === google.maps.places.PlacesServiceStatus.OK) {
-      //var marker = new google.maps.Marker({
-      //  map: map,
-      //  position: place.geometry.location
-      //});
-      console.log("start==========================")
-      console.log(place)
       generateSideBarcontent(place);
     }
   });

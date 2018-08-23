@@ -223,6 +223,7 @@ function searchMapViaId(placeId){
   }, function(place, status) {
     if (status === google.maps.places.PlacesServiceStatus.OK) {
       generateSideBarcontent(place);
+      getCheckins(place.place_id);
     }
   });
 }
@@ -402,4 +403,22 @@ function showRestaurantsDraw(radius,lat,lng){
         };  
       });
 }
+
+function getCheckins(placeId){
+  var url = " https://api.foursquare.com/v2/venues/" + placeId;
+  $.ajax({
+    url: url,
+    type: "get",
+    data: {client_id : '2BTCFONVEBUUZDKHI31MKUDK55CBFAEREUBGLF4JI0OQ0JF5', 
+           client_secret : "XNS2NXUAKG1A2RGWSBS23HABHJMEAKIQNEO1MZQ4JWQKK1O"},
+    dataType: 'json',
+    success: function(data){
+      console.log(data)
+      //var venues = data.response.venues;
+      //$.each(venues, function(i,venue){
+     //   $('p').append(venue.name + '<br />');
+      //});
+    }
+  });
+};
 

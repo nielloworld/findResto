@@ -17,6 +17,9 @@
         z-index: 1;
         margin-top: 6%;
       }
+      .sideOption{
+        margin: 50px;
+      }
       #sideContainer{
         display: flex;
        

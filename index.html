@@ -18,14 +18,26 @@
 
 </head>
 <body>
-  <div class="ui very wide sidebar inverted vertical menu">
+  <div id="sidebar" class="ui very wide sidebar inverted vertical menu">
     <div id="sideContainer" class="ui container">
         <div id="searchBox" class="ui icon input">
             <input type="text" id="pac-input" placeholder="Search...">
             <i class="inverted circular search link icon"></i>
           </div>
+          <div class="sideOption">
+              <div class="ui large buttons">
+                  <button id="restaurant" class="ui button" onclick="showRestaurants('Restaurant')">Restaurant</button>
+                  <div  class="or"></div>
+                  <button id="coffeeshop" class="ui button" onclick="showRestaurants('Cafe')">Cafe</button>
+                  <div  class="or"></div>
+                  <button id="food" class="ui button" onclick="showRestaurants('Food')">Food</button>
+                </div>
+          </div>
+          <div id="sideDetails">
+
+          </div>
     </div>
-   
+    
   </div>
   <div class="pusher">
     <!-- MAP !-->
@@ -33,10 +45,12 @@
       <i class="align justify icon"></i>
     </button>
     <div id="map"></div>
-    <div id="right-panel">
-        <h2>Results</h2>
+    <div id="right-panel" class="ui card">
+        <div class="content">
+            <div id="rightHeader" class="header"></div>
+          </div>
         <ul id="places"></ul>
-        <button id="more">More results</button>
+        <button id="more"  class="ui primary button">More results</button>
     </div>
     <!-- content of the place-->
     <div id="infowindow-content">
@@ -47,7 +61,7 @@
   </div>
   <script src="js/load.js"></script>
     
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKHT1jXtj-W4NcZpOY1Tzt8z-avZhuFCU&libraries=places&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKHT1jXtj-W4NcZpOY1Tzt8z-avZhuFCU&libraries=places,drawing&callback=initMap" async defer></script>
   
 </body>
 </html>

@@ -410,7 +410,8 @@ function getCheckins(placeId){
     url: url,
     type: "get",
     data: {client_id : '2BTCFONVEBUUZDKHI31MKUDK55CBFAEREUBGLF4JI0OQ0JF5', 
-           client_secret : "XNS2NXUAKG1A2RGWSBS23HABHJMEAKIQNEO1MZQ4JWQKK1O"},
+           client_secret : "XNS2NXUAKG1A2RGWSBS23HABHJMEAKIQNEO1MZQ4JWQKK1O"
+          v : '20180823'},
     dataType: 'json',
     success: function(data){
       console.log(data)

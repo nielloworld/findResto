@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="css/index.css">
-    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.cerulean.min.css">
     <script
         src="https://code.jquery.com/jquery-3.1.1.min.js"
         integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
@@ -14,28 +14,34 @@
     <script src="semantic/dist/semantic.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="js/map.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <title>imTheMap</title>
 
 </head>
 <body>
-  <div id="sidebar" class="ui very wide sidebar inverted vertical menu">
+  <div id="sidebar" class="ui very wide sidebar  vertical menu">
     <div id="sideContainer" class="ui container">
         <div id="searchBox" class="ui icon input">
             <input type="text" id="pac-input" placeholder="Search...">
             <i class="inverted circular search link icon"></i>
           </div>
+          
           <div class="sideOption">
+                <div class="sideTitle ui segment" >
+              <div> <h3>Search this area</h3> <hr></div> 
               <div class="ui large buttons">
-                  <button id="restaurant" class="ui button" onclick="showRestaurants('Restaurant')">Restaurant</button>
+                  <button id="restaurant" class="ui button" >Restaurant</button>
                   <div  class="or"></div>
-                  <button id="coffeeshop" class="ui button" onclick="showRestaurants('Cafe')">Cafe</button>
+                  <button id="coffeeshop" class="ui button" >Cafe</button>
                   <div  class="or"></div>
-                  <button id="food" class="ui button" onclick="showRestaurants('Food')">Food</button>
+                  <button id="food" class="ui button" >Food</button>
                 </div>
           </div>
+        </div>
           <div id="sideDetails">
-
+                
           </div>
+
           <div id="sideDetailsDirection">
 
         </div>
@@ -44,7 +50,7 @@
   </div>
   <div class="pusher">
     <!-- MAP !-->
-    <button id="sidebutton" class="right attached ui secondary open button">
+    <button id="sidebutton" class="right attached ui primary open button">
       <i class="align justify icon"></i>
     </button>
     <div id="map"></div>

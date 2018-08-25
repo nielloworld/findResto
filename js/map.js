@@ -7,10 +7,14 @@ var all_overlays = [];
 var end_direction  
 var directionsService
 var directionsDisplay
+var data1 = [['Restaurant','Restaurant\`s rating']];
+var data2 = [['Restaurant', 'User check-ins', 'Users', 'Tips']];
+var data3 = [[]];
+
 function initMap() {
-  // directions
-   directionsService = new google.maps.DirectionsService();
-directionsDisplay = new google.maps.DirectionsRenderer({
+    // directions
+    directionsService = new google.maps.DirectionsService();
+    directionsDisplay = new google.maps.DirectionsRenderer({
     draggable: true,
     map: map,
     panel: document.getElementById('sideDetails')
@@ -28,9 +32,83 @@ directionsDisplay = new google.maps.DirectionsRenderer({
   showRestaurants('Restaurant');
   //drawCapability
   drawingManager();
+  generateGraph();
+  window.onload = function(){
+    
+    $('.sidebar')
+    .sidebar( 'show')
+    document.getElementById('restaurant').onclick = function() {
+      //     Your code
+      showRestaurants('Restaurant')
+      generateGraph();
+        }
+        document.getElementById('coffeeshop').onclick = function() {
+          //     Your code
+          showRestaurants('Cafe')
+          generateGraph();
+            }
+            document.getElementById('food').onclick = function() {
+              //     Your code
+              showRestaurants('Food')
+              generateGraph();
+                } 
+};
   
 }
 
+function generateGraph(){
+   // Load Charts and the corechart package.
+   google.charts.load('current', {'packages':['corechart']});
+
+      google.charts.setOnLoadCallback(drawHistoChart2);
+   google.charts.setOnLoadCallback(drawHistoChart);
+
+
+
+}
+
+
+
+function drawHistoChart2(options, divname){
+  var data = google.visualization.arrayToDataTable(data2);
+  var options = {
+    title: 'Number of checkins, users and tips',
+    legend: { position: 'top', maxLines: 2 },
+    colors: ['#5C3292', '#1A8763', '#871B47', '#999999'],
+    interpolateNulls: false,
+    'width':470,
+    'height':300
+  
+  };
+  var sideDetails = document.getElementById('sideDetails');
+  sideDetails.classList.add("ui");
+  sideDetails.classList.add("card");
+  sideDetails.innerHTML += `
+  <div id="data2" style="width: 470px; height: 300px;"></div>`
+
+  var chart = new google.visualization.Histogram(document.getElementById('data2'));
+  chart.draw(data, options);
+}
+function drawHistoChart(options, divname){
+  var data = google.visualization.arrayToDataTable(data1);
+  options = {
+    title: 'Number of Restaurant/Food/Cafe that corresponds to rating',
+    legend: { position: 'top', maxLines: 1 },
+    colors: ['#4285F4'],
+    interpolateNulls: false,
+    'width':470,
+    'height':300
+
+  };
+  var sideDetails = document.getElementById('sideDetails');
+  sideDetails.classList.add("ui");
+  sideDetails.classList.add("card");
+  sideDetails.innerHTML += `
+  <div id="data1" style="width: 470px; height: 300px;"></div>`
+
+  var chart = new google.visualization.Histogram(document.getElementById('data1'));
+  chart.draw(data, options);
+}
 function generateInfoWindowContent(content){
  if ( content.opening_hours && typeof content.opening_hours != "undefined"){
   var branchopen = "Closed";
@@ -46,7 +124,7 @@ function generateInfoWindowContent(content){
 
 }
 
-function generateSideBarcontent(content){
+function generateSideBarcontent(content, data){
  
   if ( content.opening_hours && typeof content.opening_hours != "undefined"){
     var branchopen = "N/A";
@@ -65,7 +143,9 @@ function generateSideBarcontent(content){
     <div class="description">
       <p>address:<b> `+ content.formatted_address +`</b></p>
       <p>phone: <b>`+ content.formatted_phone_number +`</b></p>
-      <p>rating: <b>`+ content.rating +`</b></p>
+      <p>rating: ` +content.rating+`<div class="ui rating" data-rating="`+ Math.round(content.rating) +`" data-max-rating="5"></div></p>
+      
+      <p>no. of visits: <b>`+ data.response.venues[0].stats.checkinsCount +`</b></p>
       <p><b>`+ branchopen +`</b></p>
       <hr>
       <p>website: <b>`+ content.website +`</b></p>
@@ -73,7 +153,7 @@ function generateSideBarcontent(content){
   </div> 
   <div class="extra content">
     <div class="right floated author">
-      <button class ="ui button"  id="getDirections">get directions</button>
+      <button class ="ui red button"  id="getDirections">Get directions</button>
     </div>
   </div>
   </div>`
@@ -106,10 +186,15 @@ function calcRoute() {
   });
 }
 function bindingFunction(){
+  $('.ui.rating')
+  .rating()
+; 
   document.getElementById('getDirections').onclick = function() {
 //     Your code
 calcRoute();
   }
+  
+ 
 }
 function changeContent(){
   $('.sidebar')
@@ -139,6 +224,7 @@ function markerFunctions(marker, infowindow, content){
 
   marker.addListener('click', function(){
     //directionsDisplay.setMap(null);
+    directionsDisplay.set('directions', null);
     closableContent()
     searchMapViaId(content.place_id, function(trueContent){
      
@@ -146,21 +232,41 @@ function markerFunctions(marker, infowindow, content){
   });
 }
 
+function generateCheckins(data){
+  
+  data2 = [['Restaurant', 'User check-ins', 'Users', 'Tips']];
+  for (var i = 0, venue; venue = data.response.venues[i]; i++) {
+    insert = [venue.name, venue.stats.checkinsCount, venue.stats.usersCount, venue.stats.tipCount]
+    data2.push(insert)
+  //response.venues[0].stats.checkinsCount
+  }
+  
+}
+
 function createMarkers(places) {
+  
   var bounds = new google.maps.LatLngBounds();
   var placesList = document.getElementById('places');
   var urlicon="";
   for (var i = 0, place; place = places[i]; i++) {
+    // analytics
+    insert = [place.name, place.rating]
+    data1.push(insert)
     if (place.types.includes('cafe')){
-      urlicon='https://image.flaticon.com/icons/svg/35/35101.svg'
+      //urlicon='https://image.flaticon.com/icons/svg/35/35101.svg'
+      urlicon='http://maps.google.com/mapfiles/kml/pal2/icon54.png'
     }else{
-      urlicon='https://i1.wp.com/hentiesbaytourism.com/wp-content/uploads/2016/06/restaurant_marker.png'
+      //urlicon='https://i1.wp.com/hentiesbaytourism.com/wp-content/uploads/2016/06/restaurant_marker.png'
+      urlicon='http://maps.google.com/mapfiles/kml/pal2/icon34.png'
+      
     }
     var image = {
       url: urlicon,
 
       scaledSize: new google.maps.Size(45, 45)
     };
+
+ 
     var infowindow = new google.maps.InfoWindow();
     //var infowindowContent = document.getElementById('infowindow-content');
 
@@ -183,12 +289,21 @@ function createMarkers(places) {
     bounds.extend(place.geometry.location);
   }
   map.fitBounds(bounds);
+
+  //get checkin for graph
+  getCheckins("10.309576,123.893056", 'none', '50', function(checkin) {
+
+    generateCheckins(checkin);
+});
+generateGraph();
 }
 
 
 
 function showRestaurants(rtype){
-  hideContent();
+  directionsDisplay.set('directions', null);
+  
+  //hideContent();
   cleanrightBar();
   deleteMarkers(markers);
   var rightHeader = document.getElementById('rightHeader');
@@ -202,12 +317,18 @@ function showRestaurants(rtype){
     moreButton.disabled = true;
     if (getNextPage) getNextPage();
   };
+  if (moreButton.disabled == true){
 
+    data1 = [['Restaurant','Restaurant\`s rating']];
+  }else{
+    
+  }
   // Perform a nearby search.
   service.nearbySearch(
       {location: cebuMap, radius: 5000, type: [rtype]},
       function(results, status, pagination) {
         if (status !== 'OK') return;
+        
         createMarkers(results);
         moreButton.disabled = !pagination.hasNextPage;
         getNextPage = pagination.hasNextPage && function() {
@@ -222,8 +343,11 @@ function searchMapViaId(placeId){
     placeId: placeId
   }, function(place, status) {
     if (status === google.maps.places.PlacesServiceStatus.OK) {
-      generateSideBarcontent(place);
-      getCheckins(place.place_id);
+      console.log(place)
+      getCheckins(place.geometry.location.toUrlValue(5), place.name, '1', function(checkin) {
+
+        generateSideBarcontent(place, checkin);
+});
     }
   });
 }
@@ -267,16 +391,7 @@ function searchMap(){
     marker.setVisible(true);
     searchmarkers.push(marker);
     showMarkers(searchmarkers);
-    var address = '';
-    if (place.address_components) {
-      address = [
-        (place.address_components[0] && place.address_components[0].short_name || ''),
-        (place.address_components[1] && place.address_components[1].short_name || ''),
-        (place.address_components[2] && place.address_components[2].short_name || '')
-      ].join(' ');
-    }
-    //populateData(infowindowContent,place.icon,place.name,address)    
-    //infowindow.open(map, marker);
+
     searchMapViaId(place.place_id, function(trueContent){
       
     })
@@ -349,11 +464,13 @@ function drawingManager(){
       zIndex: 1
     }
   });
+  
   drawingManager.setMap(map);
   drawingManager.setDrawingMode(null);
 
   google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
     all_overlays.push(event);
+    drawingManager.setDrawingMode(null);
     if (event.type == 'circle') {
       var radius = event.overlay.getRadius();
       var lat = event.overlay.getCenter().lat();
@@ -363,11 +480,20 @@ function drawingManager(){
       console.log(event.overlay.getMap().center.lat());
       console.log(event.overlay.getMap().center.lng());
     }
-    deleteAllShape();
+    
     drawingManager.setDrawingMode(null);
+    
     showRestaurantsDraw(radius,lat,lng);
   });
   
+  google.maps.event.addListener(drawingManager, 'drawingmode_changed', function(event) {
+    if ( all_overlays.length > 1) {
+      all_overlays[0].overlay.setMap(null);
+      
+      all_overlays.shift();
+      
+    }
+  });
 }
 
 function deleteAllShape() {
@@ -378,6 +504,8 @@ function deleteAllShape() {
 }
 
 function showRestaurantsDraw(radius,lat,lng){
+  
+ 
   cleanrightBar();
   deleteMarkers(markers);
   var rightHeader = document.getElementById('rightHeader');
@@ -390,10 +518,15 @@ function showRestaurantsDraw(radius,lat,lng){
     moreButton.disabled = true;
     if (getNextPage) getNextPage();
   };
+  if (moreButton.disabled == true){
 
+    data1 = [['Restaurant','Restaurant\`s rating']];
+  }else{
+    
+  }
   // Perform a nearby search.
   service.nearbySearch(
-      {location: {lat:  lat, lng: lng}, radius: radius, type: ['food']},
+      {location: {lat:  lat, lng: lng}, radius: radius, type: ['restaurant']},
       function(results, status, pagination) {
         if (status !== 'OK') return;
         createMarkers(results);
@@ -402,22 +535,42 @@ function showRestaurantsDraw(radius,lat,lng){
           pagination.nextPage();
         };  
       });
+      
 }
 
-function getCheckins(placeId){
-  var url = " https://api.foursquare.com/v2/venues/" + placeId;
+function getCheckins(latlng,name,limit, callback){
+var url = "https://api.foursquare.com/v2/venues/search";
+var data ={
+  intent: 'match',
+  ll: latlng,
+  name: name,
+  limit:limit, 
+  oauth_token : "SEDEULG4BHJCIHRMH55HK0WIEDD2ZENRJG0MYYEHOBL3PVNQ",
+  v : '20180823'}
+
+if (limit != "1"){
+  var url = "https://api.foursquare.com/v2/venues/search";
+var data ={
+  intent: 'checkin',
+  ll: latlng,
+  limit:limit, 
+  oauth_token : "SEDEULG4BHJCIHRMH55HK0WIEDD2ZENRJG0MYYEHOBL3PVNQ",
+  v : '20180823'}
+}
   $.ajax({
     url: url,
     type: "get",
-    data: {client_id : '2BTCFONVEBUUZDKHI31MKUDK55CBFAEREUBGLF4JI0OQ0JF5', 
-           client_secret : "XNS2NXUAKG1A2RGWSBS23HABHJMEAKIQNEO1MZQ4JWQKK1O",
-          v : '20180823'},
-    dataType: 'json',
+    data: data,
     success: function(data){
       console.log(data)
+      console.log(data.response.venues[0].stats.checkinsCount);  
+      callback(data);
+      //returnResponse.customerCount = (typeof data.response.venues[0].stats.usersCount != "undefined") ? data.response.venues[0].stats.usersCount : "";
+      //returnResponse.checkinCount = (typeof data.response.venues[0].stats.checkinsCount != "undefined") ? data.response.venues[0].stats.checkinsCount : "";
+
       //var venues = data.response.venues;
       //$.each(venues, function(i,venue){
-     //   $('p').append(venue.name + '<br />');
+      //   $('p').append(venue.name + '<br />');
       //});
     }
   });

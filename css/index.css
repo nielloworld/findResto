@@ -12,13 +12,22 @@
         margin: 0;
         padding: 0;
       }
+      #sideDetails{
+        width: 100%;
+      }
       #sidebutton{
         position: absolute;
         z-index: 1;
-        margin-top: 6%;
+        margin-top: 8%;
+      }
+
+      .sideTitle{
+        text-align: center;
       }
       .sideOption{
-        margin: 50px;
+        margin: 65px;
+        margin-bottom: 10px;
+        width: 100%;
       }
       #sideContainer{
         display: flex;
@@ -30,8 +39,8 @@
       #searchBox{
         display: flex; 
         position: fixed;
-        top: 5px;
-        width: 80%;
+        top: 16px;
+        width: 95%;
       }
       #right-panel {
         font-family: 'Roboto','sans-serif';
@@ -53,7 +62,7 @@
       #right-panel {
         font-family: Arial, Helvetica, sans-serif;
         position: absolute;
-        right: 5px;
+        left: 5px;
         top: 60%;
         margin-top: -195px;
         height: 330px;

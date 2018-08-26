@@ -63,10 +63,8 @@ function initMap() {
 
 function generateroutes(){
   document.getElementById('places').innerHTML = ''
-  console.log(getroutes);
+  
   getroutes.forEach(function(r) {
-    console.log("wewewwe")
-      console.log(r)
       document.getElementById('places').innerHTML += r 
           
   });
@@ -319,7 +317,7 @@ function createMarkers(places) {
   map.fitBounds(bounds);
 
   //get checkin for graph
-  getCheckins("10.309576,123.893056", 'none', '50', function(checkin) {
+  getCheckins("10.309576,123.893056", 'none', '20', function(checkin) {
 
     generateCheckins(checkin);
 });

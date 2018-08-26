@@ -10,7 +10,7 @@ var directionsDisplay
 var data1 = [['Restaurant','Restaurant\`s rating']];
 var data2 = [['Restaurant', 'User check-ins', 'Users', 'Tips']];
 var data3 = [[]];
-
+var getroutes = [];
 function initMap() {
     // directions
     directionsService = new google.maps.DirectionsService();
@@ -34,26 +34,42 @@ function initMap() {
   drawingManager();
   generateGraph();
   window.onload = function(){
-    
     $('.sidebar')
     .sidebar( 'show')
     document.getElementById('restaurant').onclick = function() {
       //     Your code
+      getroutes = [];
+      deleteAllShape();
       showRestaurants('Restaurant')
       generateGraph();
         }
         document.getElementById('coffeeshop').onclick = function() {
           //     Your code
+          getroutes = [];
+          deleteAllShape();
           showRestaurants('Cafe')
           generateGraph();
             }
             document.getElementById('food').onclick = function() {
               //     Your code
+              getroutes = [];
+              deleteAllShape();
               showRestaurants('Food')
               generateGraph();
                 } 
 };
   
+}
+
+function generateroutes(){
+  document.getElementById('places').innerHTML = ''
+  console.log(getroutes);
+  getroutes.forEach(function(r) {
+    console.log("wewewwe")
+      console.log(r)
+      document.getElementById('places').innerHTML += r 
+          
+  });
 }
 
 function generateGraph(){
@@ -62,7 +78,7 @@ function generateGraph(){
 
       google.charts.setOnLoadCallback(drawHistoChart2);
    google.charts.setOnLoadCallback(drawHistoChart);
-
+   generateroutes()
 
 
 }
@@ -83,6 +99,7 @@ function drawHistoChart2(options, divname){
   var sideDetails = document.getElementById('sideDetails');
   sideDetails.classList.add("ui");
   sideDetails.classList.add("card");
+  sideDetails.innerHTML = ``
   sideDetails.innerHTML += `
   <div id="data2" style="width: 470px; height: 300px;"></div>`
 
@@ -103,6 +120,7 @@ function drawHistoChart(options, divname){
   var sideDetails = document.getElementById('sideDetails');
   sideDetails.classList.add("ui");
   sideDetails.classList.add("card");
+
   sideDetails.innerHTML += `
   <div id="data1" style="width: 470px; height: 300px;"></div>`
 
@@ -125,14 +143,18 @@ function generateInfoWindowContent(content){
 }
 
 function generateSideBarcontent(content, data){
- 
-  if ( content.opening_hours && typeof content.opening_hours != "undefined"){
+  var branchopen = "N/A";
+  if ( content.opening_hours &&  content.opening_hours !== "undefined"){
     var branchopen = "N/A";
     if (content.opening_hours.open_now == true){
       branchopen = "Open";
     }else{
       branchopen = "Closed";
     }
+  }
+var count = 0;
+  if (data.response.venues[0].stats.checkinsCount !== undefined && typeof data.response.venues[0].stats.checkinsCount != undefined){
+    count = data.response.venues[0].stats.checkinsCount
   }
   var sideDetails = document.getElementById('sideDetails');
   sideDetails.classList.add("ui");
@@ -145,7 +167,7 @@ function generateSideBarcontent(content, data){
       <p>phone: <b>`+ content.formatted_phone_number +`</b></p>
       <p>rating: ` +content.rating+`<div class="ui rating" data-rating="`+ Math.round(content.rating) +`" data-max-rating="5"></div></p>
       
-      <p>no. of visits: <b>`+ data.response.venues[0].stats.checkinsCount +`</b></p>
+      <p>no. of visits: <b>`+ count  +`</b></p>
       <p><b>`+ branchopen +`</b></p>
       <hr>
       <p>website: <b>`+ content.website +`</b></p>
@@ -160,7 +182,7 @@ function generateSideBarcontent(content, data){
   var elat = content.geometry.location.lat();
   var elng = content.geometry.location.lng();
   end_direction = {lat: elat, lng: elng};
-  bindingFunction();
+  bindingFunction(content);
   
 }
 
@@ -185,7 +207,7 @@ function calcRoute() {
     }
   });
 }
-function bindingFunction(){
+function bindingFunction(data){
   $('.ui.rating')
   .rating()
 ; 
@@ -193,9 +215,10 @@ function bindingFunction(){
 //     Your code
 calcRoute();
   }
-  
- 
+
 }
+
+
 function changeContent(){
   $('.sidebar')
   .sidebar( 'show')
@@ -248,6 +271,7 @@ function createMarkers(places) {
   var bounds = new google.maps.LatLngBounds();
   var placesList = document.getElementById('places');
   var urlicon="";
+  placesList.innerHTML = "";
   for (var i = 0, place; place = places[i]; i++) {
     // analytics
     insert = [place.name, place.rating]
@@ -282,10 +306,14 @@ function createMarkers(places) {
     
     markerFunctions(marker, infowindow, place);
     markers.push(marker);
-    var li = document.createElement('li');
-    li.textContent = place.name;
-    placesList.appendChild(li);
-
+    //  var li = document.createElement('li');
+    //li.textContent = '<a onclick="getplaceid('+ place.formatted_address+')>'+ place.name +'</a>';
+    //placesList.appendChild(li);
+    
+  
+    //placesList.innerHTML += '<li><a  id="place_id_' +place.place_id+'">'+ place.name +'</a></li>';
+    //getroutes.push("place_id_" + place.place_id);
+    getroutes.push('<li><a  onclick=searchMapViaId("'+ place.place_id +'")>'+ place.name +'</a></li>');
     bounds.extend(place.geometry.location);
   }
   map.fitBounds(bounds);
@@ -297,7 +325,6 @@ function createMarkers(places) {
 });
 generateGraph();
 }
-
 
 
 function showRestaurants(rtype){
@@ -336,14 +363,13 @@ function showRestaurants(rtype){
         };  
       });
 }
-
 function searchMapViaId(placeId){
   var service = new google.maps.places.PlacesService(map);
   service.getDetails({
     placeId: placeId
   }, function(place, status) {
     if (status === google.maps.places.PlacesServiceStatus.OK) {
-      console.log(place)
+      //console.log(place)
       getCheckins(place.geometry.location.toUrlValue(5), place.name, '1', function(checkin) {
 
         generateSideBarcontent(place, checkin);
@@ -353,6 +379,7 @@ function searchMapViaId(placeId){
 }
 
 function searchMap(){
+    
     var input = document.getElementById('pac-input');
     var types = "Restaurant";
     var autocomplete = new google.maps.places.Autocomplete(input);
@@ -370,8 +397,13 @@ function searchMap(){
       
     autocomplete.addListener('place_changed', function() {
     infowindow.close();
+    deleteAllShape();
     clearMarkers(markers);
+    
+  
     marker.setVisible(false);
+    var rightHeader = document.getElementById('places');
+    rightHeader.innerHTML = '';
     var place = autocomplete.getPlace();
     if (!place.geometry) {
       // User entered the name of a Place that was not suggested and
@@ -477,8 +509,8 @@ function drawingManager(){
       var lng = event.overlay.getCenter().lng();
 
     }else{
-      console.log(event.overlay.getMap().center.lat());
-      console.log(event.overlay.getMap().center.lng());
+    //  console.log(event.overlay.getMap().center.lat());
+     // console.log(event.overlay.getMap().center.lng());
     }
     
     drawingManager.setDrawingMode(null);
@@ -562,16 +594,8 @@ var data ={
     type: "get",
     data: data,
     success: function(data){
-      console.log(data)
-      console.log(data.response.venues[0].stats.checkinsCount);  
       callback(data);
-      //returnResponse.customerCount = (typeof data.response.venues[0].stats.usersCount != "undefined") ? data.response.venues[0].stats.usersCount : "";
-      //returnResponse.checkinCount = (typeof data.response.venues[0].stats.checkinsCount != "undefined") ? data.response.venues[0].stats.checkinsCount : "";
 
-      //var venues = data.response.venues;
-      //$.each(venues, function(i,venue){
-      //   $('p').append(venue.name + '<br />');
-      //});
     }
   });
 };

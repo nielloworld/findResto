@@ -86,7 +86,7 @@ function generateGraph(){
 function drawHistoChart2(options, divname){
   var data = google.visualization.arrayToDataTable(data2);
   var options = {
-    title: 'Number of checkins, users and tips',
+    title: '[Constant graph] - Number of checkins, users and tips',
     legend: { position: 'top', maxLines: 2 },
     colors: ['#5C3292', '#1A8763', '#871B47', '#999999'],
     interpolateNulls: false,
@@ -107,7 +107,7 @@ function drawHistoChart2(options, divname){
 function drawHistoChart(options, divname){
   var data = google.visualization.arrayToDataTable(data1);
   options = {
-    title: 'Number of Restaurant/Food/Cafe that corresponds to rating',
+    title: '[Active graph] - Number of Restaurant/Food/Cafe that corresponds to rating',
     legend: { position: 'top', maxLines: 1 },
     colors: ['#4285F4'],
     interpolateNulls: false,
@@ -304,13 +304,7 @@ function createMarkers(places) {
     
     markerFunctions(marker, infowindow, place);
     markers.push(marker);
-    //  var li = document.createElement('li');
-    //li.textContent = '<a onclick="getplaceid('+ place.formatted_address+')>'+ place.name +'</a>';
-    //placesList.appendChild(li);
-    
-  
-    //placesList.innerHTML += '<li><a  id="place_id_' +place.place_id+'">'+ place.name +'</a></li>';
-    //getroutes.push("place_id_" + place.place_id);
+
     getroutes.push('<li><a  onclick=searchMapViaId("'+ place.place_id +'")>'+ place.name +'</a></li>');
     bounds.extend(place.geometry.location);
   }
@@ -477,6 +471,8 @@ function cleanrightBar(){
 }
 
 function drawingManager(){
+
+  directionsDisplay.set('directions', null);
   var drawingManager = new google.maps.drawing.DrawingManager({
     drawingMode: google.maps.drawing.OverlayType.MARKER,
     drawingControl: true,
@@ -517,6 +513,8 @@ function drawingManager(){
   });
   
   google.maps.event.addListener(drawingManager, 'drawingmode_changed', function(event) {
+
+  directionsDisplay.set('directions', null);
     if ( all_overlays.length > 1) {
       all_overlays[0].overlay.setMap(null);
       
